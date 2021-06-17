@@ -1,37 +1,32 @@
-from requestsFile import requestFunc
+from functions import requestFunc, printSongs
+
+from os import system
+_ = system('clear')  # clears the terminal/console window before each run
 
 scriptInProgress = True
 
 while(scriptInProgress):
-    # get user input
-    songInput = input("Enter a song: ")
-    # send first request
-    initApiResponse = requestFunc(songInput, "search")
-    # process desired data from reponse
-
-    hitsList = initApiResponse['tracks']['hits']
+    songInput = input("\nEnter a song: ")
+    # send first request and access wanted data
+    hitsList = requestFunc(songInput, "search")['tracks']['hits']
 
     # ask user to pick their song from the provided list based on its index.
-    print("Enter a value coresponding to the song you entered.")
-    for song in hitsList:  # prints out options
-        index = hitsList.index(song)
-        name = song['track']['title']
-        print(f"({index}) - {name}")
+    printSongs("\nSearch results:", hitsList)
 
-    hitIndex = int(input("Value: "))
+    hitIndex = int(input("\nEnter a number coresponding to your song: ")) - 1
 
-    # request and display recommended songs
     # get key to send with list-recommendations request
     key = (hitsList[hitIndex]['track']['key'])
-    tracksList = requestFunc(key, "songs/list-recommendations")['tracks']
 
-    if len(tracksList) == 0:
-        print("Sorry, no recommendations.")
-    else:
-        print("Based on your song input, here are some songs you might like")
-        for song in tracksList:
-            name = song['title']
-            print(name)
+    # might return an empty dict
+    tracksData = requestFunc(key, "songs/list-recommendations")
+
+    if tracksData:  # makes sure the dict is not empty
+        tracksList = tracksData['tracks']
+        printSongs(
+            "\nBased on your song, here are some songs you might like.", tracksList)
+    else:  # if list is empty
+        print("\nSorry, no recommendations for that song.")
 
     # terminate script?
-    scriptInProgress = int(input("Enter 0 to quit: "))
+    scriptInProgress = int(input("\nEnter 0 to quit or 1 to continue: "))
