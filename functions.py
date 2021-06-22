@@ -1,6 +1,5 @@
 import requests
 
-
 def requestFunc(inputPeram, endpoint):
     if endpoint == "search":
         querystring = {"term": inputPeram,
